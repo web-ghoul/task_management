@@ -1,0 +1,9 @@
+@import "../assets/styles/variable.scss";
+.modal_box{
+    background-color: $white;
+    max-width: 80vw;
+    width: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}

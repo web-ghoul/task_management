@@ -1,0 +1,13 @@
+@import "../../assets/styles/variable.scss";
+.footer{
+    background-color: $black;
+    border-top: 4px solid $main;
+    .footer_lower{
+        background-color: $dark;
+        .footer_lower_contain{
+            .footer_lower_box{
+                color: $white;
+            }
+        }
+    }
+}

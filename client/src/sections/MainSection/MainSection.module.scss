@@ -1,0 +1,26 @@
+@import "../../assets/styles/variable.scss";
+.main_section{
+    grid-template-columns: repeat(2,1fr);
+    height: calc(100vh - 80px);
+    .main_section_image{
+        animation-name: moveFromTop;
+        animation-fill-mode: both;
+        animation-duration: 5s;
+        animation-iteration-count: infinite;
+        img{
+            width: 100%;
+        }
+        @keyframes moveFromTop {
+            50%{
+              transform: translateY(15px);
+            }
+            100% {
+              transform: translateY(0px);
+            }
+        }
+    }
+
+    .main_section_content{
+
+    }
+}

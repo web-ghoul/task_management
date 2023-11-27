@@ -1,0 +1,12 @@
+@import "../../assets/styles/variable.scss";
+.task_box{
+    box-shadow: $box_shadow;
+    background-color: $white;
+    overflow: hidden;
+    .task_cat{
+        background-color: $main;
+        & svg{
+            color: $white;
+        }
+    }
+}
