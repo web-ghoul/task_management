@@ -1,3 +1,8 @@
+@import "../../assets/styles/variable.scss";
 .tasks_box{
     grid-template-columns: repeat(3,1fr);
+}
+
+.no_tasks_title{
+    color:$gray;
 }

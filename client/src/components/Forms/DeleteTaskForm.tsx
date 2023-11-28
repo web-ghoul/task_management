@@ -13,12 +13,12 @@ const DeleteTaskForm = ({loading}: Props) => {
     const {handleCloseDeleteTaskModal} = useTaskContext()
   return (
     <>
-        <Typography variant="h5" >Are You Sure ?</Typography>
-        <ButtonGroup>
+        <Typography variant="h4" className={`tac center_rel_x`}>Are You Sure ?</Typography>
+        <ButtonGroup className={`flex jcfe aic`}>
             <PrimaryButton onClick={handleCloseDeleteTaskModal}>Cancel</PrimaryButton>
             <LoadButton loading={loading}>
-            <DeleteButton type={"submit"}>Update</DeleteButton>
-          </LoadButton>
+              <DeleteButton type={"submit"}>Delete</DeleteButton>
+            </LoadButton>
         </ButtonGroup>
     </>
   )

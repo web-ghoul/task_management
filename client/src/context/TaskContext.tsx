@@ -1,24 +1,27 @@
 import { ReactNode, createContext, useState } from "react";
 import { TaskContextTypes, TaskTypes } from "../types/app.types";
 
-export const TaskContext = createContext<TaskContextTypes>({
-  openDeleteTaskModal: false,
-  openUpdateTaskModal: false,
-  openAddTaskModal: false,
-  updatableTaskData: undefined,
-  handleSetUpdatableTaskData: () => {}
-});
+export const TaskContext = createContext<TaskContextTypes | undefined>(
+  undefined
+);
 
 type Props = {
   children: ReactNode;
 };
 
-const TaskProvider: React.FC<{ children: ReactNode }> = ({
-  children
-}: Props) => {
-  const [updatableTaskData, setUpdatableTaskData] = useState<
-    TaskTypes | undefined
-  >();
+const TaskProvider: React.FC<Props> = ({ children }: Props) => {
+  const [updatableTaskData, setUpdatableTaskData] = useState<TaskTypes>({
+    id: 0,
+    title: "",
+    description: "",
+    dueDate: "",
+    completed: false,
+    userId: "",
+    category: ""
+  });
+
+  const [taskId, setTaskId] = useState<number>(0);
+
   const [openDeleteTaskModal, setOpenDeleteTaskModal] = useState<boolean>(
     false
   );
@@ -35,24 +38,23 @@ const TaskProvider: React.FC<{ children: ReactNode }> = ({
     setOpenAddTaskModal(false);
   };
 
-  const handleOpenDeleteTaskModal = () => {
+  const handleOpenDeleteTaskModal = (id: number) => {
     setOpenDeleteTaskModal(true);
+    setTaskId(id);
   };
 
   const handleCloseDeleteTaskModal = () => {
     setOpenDeleteTaskModal(false);
   };
 
-  const handleOpenUpdateTaskModal = () => {
+  const handleOpenUpdateTaskModal = (taskData: TaskTypes, id: number) => {
     setOpenUpdateTaskModal(true);
+    setTaskId(id);
+    setUpdatableTaskData(taskData);
   };
 
   const handleCloseUpdateTaskModal = () => {
     setOpenUpdateTaskModal(false);
-  };
-
-  const handleSetUpdatableTaskData = (taskData: TaskTypes) => {
-    setUpdatableTaskData(taskData);
   };
 
   const TaskContextValues: TaskContextTypes = {
@@ -60,7 +62,7 @@ const TaskProvider: React.FC<{ children: ReactNode }> = ({
     openUpdateTaskModal,
     openAddTaskModal,
     updatableTaskData,
-    handleSetUpdatableTaskData,
+    taskId,
     handleOpenAddTaskModal,
     handleCloseAddTaskModal,
     handleOpenDeleteTaskModal,

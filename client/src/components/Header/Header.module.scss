@@ -5,4 +5,40 @@
     top: 10px !important;
     width: calc(100% - 160px) !important;
     box-shadow: $box_shadow;
+    .avatar{
+        width:50px
+    }
+
+    @media (max-width:$lg_size) {
+        height: 75px;
+        width: calc(100% - 120px) !important;
+        .avatar{
+            width:40px
+        }
+    }
+
+    @media (max-width:$md_size) {
+        height: 70px;
+        width: calc(100% - 80px) !important;
+        .avatar{
+            width:35px
+        }
+    }
+
+    
+    @media (max-width:$sm_size) {
+        height: 65px;
+        width: calc(100% - 40px) !important;
+        .avatar{
+            width:30px
+        }
+    }
+
+    @media (max-width:$xs_size) {
+        height: 60px;
+        width: calc(100% - 20px) !important;
+        .avatar{
+            width:20px
+        }
+    }
 }

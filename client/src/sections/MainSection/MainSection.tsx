@@ -20,17 +20,20 @@ const MainSection = (props: Props) => {
       </Box>
       <Box className={`${styles.main_section_content} grid jcfe aic g30`}>
         <Box className={`grid jcfe aic g20`}>
-          <Typography variant="h2" className={`tae main_color ttuc`}>
+          <Typography
+            variant="h2"
+            className={`${styles.main_title} tae main_color ttuc`}
+          >
             Touch Your Mind
           </Typography>
-          <Typography variant="h6" className={`tae`}>
+          <Typography variant="h6" className={`${styles.main_para} tae`}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
             aliquam accusamus, eius voluptatibus maxime ea possimus in iure
             repudiandae aut doloremque architecto facilis quisquam, unde numquam
             ratione ex, provident sit.
           </Typography>
         </Box>
-        <ButtonGroup className={`flex jcfe aic`}>
+        <ButtonGroup className={`${styles.main_buttons} flex jcfe aic`}>
           {token && userId
             ? <PrimaryButton
                 onClick={() =>

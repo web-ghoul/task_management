@@ -2,46 +2,32 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from '../entities/task.entity';
 import { TaskDto } from '../dto/task.dto';
-import { UserEntity } from '../../authentication/entities/user.entity';
 import { TasksRepository } from '../repositories/tasks.repository';
-import { UsersRepository } from 'src/authentication/repositories/authentication.repository';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(TaskEntity)
     private readonly tasksRepository: TasksRepository,
-    @InjectRepository(UserEntity)
-    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async isUserExist(userId: string): Promise<boolean> {
-    const isExist: UserEntity = await this.usersRepository.findOne({
-      where: {
-        id: userId,
-      },
+  async getAll(
+    userId: string,
+    query: { category: string } | undefined,
+  ): Promise<TaskEntity[]> {
+    const whereClause: { userId: string; category?: string } = { userId };
+    if (query && query.category) {
+      whereClause.category = query.category;
+    }
+    const allTasks = await this.tasksRepository.find({
+      where: whereClause,
+      order: { completed: 'DESC' },
     });
-    if (isExist) {
-      return true;
-    }
-    return false;
-  }
-
-  async getAll(userId: string): Promise<TaskEntity[]> {
-    const isUserExist = await this.isUserExist(userId);
-    if (!isUserExist) {
-      throw new HttpException("User isn't Exist!!", HttpStatus.BAD_REQUEST);
-    }
-    const allTasks = await this.tasksRepository.find({ where: { userId } });
-    return allTasks;
+    return allTasks.reverse();
   }
 
   async addTask(task: TaskDto): Promise<undefined> {
-    const { title, userId } = task;
-    const isUserExist = await this.isUserExist(userId);
-    if (!isUserExist) {
-      throw new HttpException("User isn't  Exist!!", HttpStatus.BAD_REQUEST);
-    }
+    const { title } = task;
     const isTaskExist: TaskEntity = await this.tasksRepository.findOne({
       where: { title },
     });
@@ -55,23 +41,47 @@ export class TasksService {
     }
   }
 
-  async updateTask(task: TaskEntity): Promise<undefined> {
-    const { id, userId } = task;
-    const isUserExist = await this.isUserExist(userId);
-    if (!isUserExist) {
-      throw new HttpException("User isn't  Exist!!", HttpStatus.BAD_REQUEST);
-    }
+  async updateTask(task: TaskDto, taskId: number): Promise<undefined> {
     const isTaskExist: TaskEntity = await this.tasksRepository.findOne({
-      where: { id },
+      where: { id: taskId },
     });
-    if (isTaskExist) {
-      throw new HttpException('Task is Exist!!', HttpStatus.BAD_REQUEST);
+    if (!isTaskExist) {
+      throw new HttpException("Task isn't Exist!!", HttpStatus.BAD_REQUEST);
     } else {
-      await this.tasksRepository.update({ id }, task);
+      await this.tasksRepository.update(taskId, task);
     }
   }
 
   async deleteTask(taskId: number): Promise<undefined> {
-    console.log(taskId);
+    const isTaskExist: TaskEntity = await this.tasksRepository.findOne({
+      where: { id: taskId },
+    });
+    if (!isTaskExist) {
+      throw new HttpException("Task isn't Exist!!", HttpStatus.BAD_REQUEST);
+    } else {
+      await this.tasksRepository.delete({ id: taskId });
+    }
+  }
+
+  async completedTask(userId: string, taskId: number): Promise<undefined> {
+    const isTaskExist: TaskEntity = await this.tasksRepository.findOne({
+      where: { id: taskId },
+    });
+    if (!isTaskExist) {
+      throw new HttpException("Task isn't Exist!!", HttpStatus.BAD_REQUEST);
+    } else {
+      await this.tasksRepository.update(taskId, { completed: true });
+    }
+  }
+
+  async notCompletedTask(userId: string, taskId: number): Promise<undefined> {
+    const isTaskExist: TaskEntity = await this.tasksRepository.findOne({
+      where: { id: taskId },
+    });
+    if (!isTaskExist) {
+      throw new HttpException("Task isn't Exist!!", HttpStatus.BAD_REQUEST);
+    } else {
+      await this.tasksRepository.update(taskId, { completed: false });
+    }
   }
 }

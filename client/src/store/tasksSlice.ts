@@ -5,10 +5,14 @@ import axios from "axios";
 
 export const getTasks = createAsyncThunk(
   "tasks/getTasks",
-  async (userId: string | undefined): Promise<TaskTypes[] | undefined> => {
-    const res = await axios.get(
-      `${process.env.REACT_APP_SERVER_URL}/tasks/${userId}`
-    );
+  async (args: {
+    token: string;
+    category?: string;
+  }): Promise<TaskTypes[] | undefined> => {
+    const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/tasks`, {
+      headers: { Authorization: `Bearer ${args.token}` },
+      params: { category: args.category }
+    });
     return res.data;
   }
 );

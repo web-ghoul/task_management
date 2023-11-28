@@ -1,5 +1,5 @@
 import loginImg from "../../assets/images/Allura - Giant Phone.png";
-import { Box, InputAdornment, Typography } from "@mui/material";
+import { Box, InputAdornment, InputLabel, Typography } from "@mui/material";
 import { PrimaryTextField } from "../../mui/PrimaryTextField";
 import { FormikProps } from "formik";
 import { PrimaryButton } from "../../mui/PrimaryButton";
@@ -65,8 +65,8 @@ const UpdateTaskForm = ({ loading, formik }: Props) => {
                 </InputAdornment>
               )
             }}
-            id="categoryId"
-            name="categoryId"
+            id="category"
+            name="category"
             select
             fullWidth
             SelectProps={{
@@ -87,11 +87,25 @@ const UpdateTaskForm = ({ loading, formik }: Props) => {
             {!isLoading &&
               categories &&
               categories.map((category, i) =>
-                <option key={i} value={category.id}>
+                <option key={i} value={category.title}>
                   {category.title}
                 </option>
               )}
           </PrimaryTextField>
+          <Box className={`grid jcs aic g10`}>
+            <InputLabel id="dueDate">Due Date</InputLabel>
+            <PrimaryTextField 
+              fullWidth  
+              name='dueDate' 
+              value={formik.values.dueDate} 
+              onChange={formik.handleChange} 
+              id="dueDate" 
+              error={Boolean(formik.touched.dueDate) && Boolean(formik.errors.dueDate)} 
+              type='date' 
+              helperText={formik.touched.dueDate && formik.errors.dueDate} 
+              onBlur={formik.handleBlur}
+            />
+          </Box>
           <LoadButton loading={loading}>
             <PrimaryButton type={"submit"}>Update</PrimaryButton>
           </LoadButton>

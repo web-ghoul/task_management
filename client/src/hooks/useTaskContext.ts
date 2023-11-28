@@ -2,32 +2,11 @@ import { useContext } from "react";
 import { TaskContext } from "../context/TaskContext";
 
 const useTaskContext = () => {
-  const {
-    openDeleteTaskModal,
-    openUpdateTaskModal,
-    openAddTaskModal,
-    updatableTaskData,
-    handleSetUpdatableTaskData,
-    handleOpenAddTaskModal,
-    handleCloseAddTaskModal,
-    handleOpenDeleteTaskModal,
-    handleCloseDeleteTaskModal,
-    handleOpenUpdateTaskModal,
-    handleCloseUpdateTaskModal
-  } = useContext(TaskContext);
-  return {
-    openDeleteTaskModal,
-    openUpdateTaskModal,
-    openAddTaskModal,
-    updatableTaskData,
-    handleSetUpdatableTaskData,
-    handleOpenAddTaskModal,
-    handleCloseAddTaskModal,
-    handleOpenDeleteTaskModal,
-    handleCloseDeleteTaskModal,
-    handleOpenUpdateTaskModal,
-    handleCloseUpdateTaskModal
-  };
+  const context = useContext(TaskContext);
+  if (!context) {
+    throw new Error("useYourContext must be used within a YourContextProvider");
+  }
+  return context;
 };
 
 export default useTaskContext;

@@ -5,7 +5,7 @@ import Footer from "./components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { login, logout } from "./store/authSlice";
+import { getUser, login, logout } from "./store/authSlice";
 import { useCookies } from "react-cookie";
 import { getCategories } from "./store/categoriesSlice";
 import { AppDispatch } from "./store/store";
@@ -23,7 +23,8 @@ function App() {
         if (token && userId) {
           dispatch(login({ token, userId }));
           dispatch(getCategories());
-          dispatch(getTasks(userId));
+          dispatch(getTasks({ token }));
+          dispatch(getUser({ token }));
         } else {
           dispatch(logout());
         }

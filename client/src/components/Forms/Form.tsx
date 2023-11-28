@@ -13,25 +13,38 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../store/authSlice";
-import { RootState } from "../../store/store";
+import { getUser, login } from "../../store/authSlice";
+import { AppDispatch, RootState } from "../../store/store";
 import useTaskContext from "../../hooks/useTaskContext";
 import AddTaskForm from "./AddTaskForm";
 import { useCookies } from "react-cookie";
 import UpdateTaskForm from "./UpdateTaskForm";
 import DeleteTaskForm from "./DeleteTaskForm";
+import { getTasks } from "../../store/tasksSlice";
+import CompletedTaskForm from "./CompletedTaskForm";
 
 type Props = {
   type: string;
+  completed?: boolean | undefined;
+  id?: number | undefined;
 };
 
-const Form = ({ type }: Props) => {
+const Form = ({ type, id, completed }: Props) => {
   const [loading, setLoading] = useState(false);
-  const { userId } = useSelector((state: RootState) => state.auth);
-  const { handleCloseAddTaskModal, updatableTaskData } = useTaskContext();
+  const { token, userId } = useSelector((state: RootState) => state.auth);
+  const {
+    handleCloseAddTaskModal,
+    taskId,
+    updatableTaskData,
+    handleCloseUpdateTaskModal,
+    handleCloseDeleteTaskModal
+  } = useTaskContext();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [setCookie, cookies] = useCookies();
+  const dispatch = useDispatch<AppDispatch>();
+  const [cookies, setCookie] = useCookies();
+  const date = new Date();
+  const previousDate = new Date(date.getTime());
+  previousDate.setDate(date.getDate() - 1);
 
   //Login
   const loginInitialValues: LoginTypes = {
@@ -50,9 +63,9 @@ const Form = ({ type }: Props) => {
   const loginFormik = useFormik({
     initialValues: loginInitialValues,
     validationSchema: loginValidationSchema,
-    onSubmit: (values: LoginTypes) => {
+    onSubmit: async (values: LoginTypes) => {
       setLoading(true);
-      axios
+      await axios
         .post(
           `${process.env.REACT_APP_SERVER_URL}/authentication/login`,
           values
@@ -60,15 +73,16 @@ const Form = ({ type }: Props) => {
         .then(res => {
           let token: string = res.data.token;
           let userId: string = res.data.userId;
-          cookies("tmToken", token, {
+          setCookie("tmToken", token, {
             path: "/",
-            expires: new Date(Date.now() + 3600000)
+            expires: new Date(Date.now() + 36000000)
           });
-          cookies("tmUserId", userId, {
+          setCookie("tmUserId", userId, {
             path: "/",
-            expires: new Date(Date.now() + 3600000)
+            expires: new Date(Date.now() + 36000000)
           });
           dispatch(login({ token, userId }));
+          dispatch(getUser({ token }));
           navigate(`${process.env.REACT_APP_DASHBOARD_PAGE}`);
           toast.success("Login Successfully");
         })
@@ -113,9 +127,9 @@ const Form = ({ type }: Props) => {
   const registerFormik = useFormik({
     initialValues: registerInitialValues,
     validationSchema: registerValidationSchema,
-    onSubmit: (values: RegisterTypes) => {
+    onSubmit: async (values: RegisterTypes) => {
       setLoading(true);
-      axios
+      await axios
         .post(
           `${process.env.REACT_APP_SERVER_URL}/authentication/register`,
           values
@@ -145,23 +159,32 @@ const Form = ({ type }: Props) => {
     description: "",
     category: "",
     userId,
-    completed: false
+    completed: false,
+    dueDate: ""
   };
 
   const addTaskValidationSchema = yup.object({
     title: yup.string().required("Title is required"),
     description: yup.string().required("Description is required"),
-    category: yup.string().required("category is required")
+    category: yup.string().required("category is required"),
+    dueDate: yup
+      .date()
+      .min(previousDate, "Enter Valid Date")
+      .required("Enter Task Due Date")
   });
 
   const addTaskFormik = useFormik({
     initialValues: addTaskInitialValues,
     validationSchema: addTaskValidationSchema,
-    onSubmit: (values: TaskFormTypes) => {
+    onSubmit: async (values: TaskFormTypes) => {
       setLoading(true);
-      axios
-        .post(`${process.env.REACT_APP_SERVER_URL}/addTask`, values)
+      await axios
+        .post(`${process.env.REACT_APP_SERVER_URL}/tasks/addTask`, values, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
         .then(() => {
+          handleCloseAddTaskModal();
+          dispatch(getTasks({ token }));
           toast.success("Task is Created Successfully");
         })
         .catch(err => {
@@ -181,11 +204,12 @@ const Form = ({ type }: Props) => {
 
   //Update Task
   const updateTaskInitialValues = {
-    title: updatableTaskData && updatableTaskData.title,
-    description: updatableTaskData && updatableTaskData.description,
-    category: updatableTaskData && updatableTaskData.category,
+    title: updatableTaskData ? updatableTaskData.title : "",
+    description: updatableTaskData ? updatableTaskData.description : "",
+    category: updatableTaskData ? updatableTaskData.category : "",
     userId,
-    completed: updatableTaskData && updatableTaskData.completed
+    completed: updatableTaskData ? updatableTaskData.completed : false,
+    dueDate: updatableTaskData ? updatableTaskData.dueDate : ""
   };
 
   const updateTaskValidationSchema = yup.object({
@@ -197,11 +221,19 @@ const Form = ({ type }: Props) => {
   const updateTaskFormik = useFormik({
     initialValues: updateTaskInitialValues,
     validationSchema: updateTaskValidationSchema,
-    onSubmit: (values: TaskFormTypes) => {
+    onSubmit: async (values: TaskFormTypes) => {
       setLoading(true);
-      axios
-        .patch(`${process.env.REACT_APP_SERVER_URL}/updateTask`, values)
+      await axios
+        .put(
+          `${process.env.REACT_APP_SERVER_URL}/tasks/updateTask/${taskId}`,
+          values,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
         .then(() => {
+          dispatch(getTasks({ token }));
+          handleCloseUpdateTaskModal();
           toast.success("Task is Updated Successfully");
         })
         .catch(err => {
@@ -219,6 +251,96 @@ const Form = ({ type }: Props) => {
     }
   });
 
+  //Delete Task
+  const handleDeleteTask = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setLoading(true);
+    await axios
+      .delete(
+        `${process.env.REACT_APP_SERVER_URL}/tasks/deleteTask/${taskId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then(() => {
+        dispatch(getTasks({ token }));
+        handleCloseDeleteTaskModal();
+        toast.success("Task is Deleted Successfully");
+      })
+      .catch(err => {
+        try {
+          if (typeof err.response.data.message === "object") {
+            toast.error(err.response.data.message.join("\n"));
+          } else {
+            toast.error(err.response.data.message);
+          }
+        } catch (error) {
+          toast.error("error");
+        }
+      });
+    setLoading(false);
+  };
+
+  //Completed Task
+  const handleCompletedTask = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setLoading(true);
+    await axios
+      .put(
+        `${process.env.REACT_APP_SERVER_URL}/tasks/completedTask/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then(() => {
+        dispatch(getTasks({ token }));
+        toast.success("Task is Completed Successfully");
+      })
+      .catch(err => {
+        try {
+          if (typeof err.response.data.message === "object") {
+            toast.error(err.response.data.message.join("\n"));
+          } else {
+            toast.error(err.response.data.message);
+          }
+        } catch (error) {
+          toast.error("error");
+        }
+      });
+    setLoading(false);
+  };
+
+  //Not Completed Task
+  const handleNotCompletedTask = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setLoading(true);
+    await axios
+      .put(
+        `${process.env.REACT_APP_SERVER_URL}/tasks/notCompletedTask/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then(() => {
+        dispatch(getTasks({ token }));
+        toast.success("Task is Not Completed Yet");
+      })
+      .catch(err => {
+        try {
+          if (typeof err.response.data.message === "object") {
+            toast.error(err.response.data.message.join("\n"));
+          } else {
+            toast.error(err.response.data.message);
+          }
+        } catch (error) {
+          toast.error("error");
+        }
+      });
+    setLoading(false);
+  };
+
   return (
     <form
       onSubmit={
@@ -228,9 +350,15 @@ const Form = ({ type }: Props) => {
             ? registerFormik.handleSubmit
             : type === "add_task"
               ? addTaskFormik.handleSubmit
-              : () => console.log(1)
+              : type === "update_task"
+                ? updateTaskFormik.handleSubmit
+                : type === "delete_task"
+                  ? handleDeleteTask
+                  : type === "completed_task"
+                    ? handleCompletedTask
+                    : handleNotCompletedTask
       }
-      className=""
+      className={`${type === "delete_task" && "delete_Task"} grid jcs aic g30`}
     >
       {type === "login"
         ? <LoginForm loading={loading} formik={loginFormik} />
@@ -240,7 +368,18 @@ const Form = ({ type }: Props) => {
             ? <AddTaskForm loading={loading} formik={addTaskFormik} />
             : type === "update_task"
               ? <UpdateTaskForm loading={loading} formik={updateTaskFormik} />
-              : type === "delete_task" && <DeleteTaskForm loading={loading} />}
+              : type === "delete_task"
+                ? <DeleteTaskForm loading={loading} />
+                : type === "completed_task"
+                  ? <CompletedTaskForm
+                      loading={loading}
+                      completed={completed}
+                    />
+                  : type === "not_completed_task" &&
+                    <CompletedTaskForm
+                      loading={loading}
+                      completed={completed}
+                    />}
     </form>
   );
 };

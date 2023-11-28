@@ -11,4 +11,6 @@ export class TaskDto {
   readonly category: string;
   @IsString()
   readonly userId: string;
+  @IsString()
+  readonly dueDate: string;
 }

@@ -12,9 +12,10 @@ export interface RegisterTypes {
 }
 
 export interface TaskFormTypes {
-  title: string | undefined;
-  description: string | undefined;
-  completed: boolean | undefined;
-  category: string | undefined;
-  userId: string | undefined;
+  title: string;
+  description: string;
+  completed: boolean;
+  category: string;
+  userId: string;
+  dueDate: string;
 }

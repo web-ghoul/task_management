@@ -1,9 +1,22 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuthInitialState } from "../types/store.types";
+import { UserTypes } from "../types/app.types";
+import axios from "axios";
+
+export const getUser = createAsyncThunk(
+  "auth/getUser",
+  async (args: { token: string }): Promise<UserTypes | undefined> => {
+    const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/user`, {
+      headers: { Authorization: `Bearer ${args.token}` }
+    });
+    return res.data;
+  }
+);
 
 const initialState: AuthInitialState = {
   token: "",
-  userId: ""
+  userId: "",
+  user: undefined
 };
 
 const authSlice = createSlice({
@@ -18,6 +31,11 @@ const authSlice = createSlice({
       state.token = "";
       state.userId = "";
     }
+  },
+  extraReducers: builder => {
+    builder.addCase(getUser.fulfilled, (state, action) => {
+      state.user = action.payload;
+    });
   }
 });
 

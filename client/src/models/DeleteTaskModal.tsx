@@ -22,7 +22,7 @@ const DeleteTaskModal = (props: Props) => {
       }}
     >
       <Fade in={openDeleteTaskModal}>
-        <Box className={`br6 pad20 modal_box`}>
+        <Box className={`absolute br6 pad20 modal_box`}>
           <Form type="delete_task" />
         </Box>
       </Fade>

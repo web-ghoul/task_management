@@ -22,7 +22,7 @@ const UpdateTaskModal = (props: Props) => {
       }}
     >
       <Fade in={openUpdateTaskModal}>
-        <Box className={`br6 pad20 modal_box`}>
+        <Box className={`absolute br6 pad20 modal_box`}>
           <Form type="update_task" />
         </Box>
       </Fade>

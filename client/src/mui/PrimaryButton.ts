@@ -15,19 +15,17 @@ export const PrimaryButton = styled(Button)<ButtonProps>(({ theme }) => ({
     color: theme.palette.primary.main
   },
   [theme.breakpoints.down("lg")]: {
-    padding: "4px 9px",
-    borderRadius: "3px",
+    padding: "9px 18px",
     fontSize: "17px"
   },
   [theme.breakpoints.down("md")]: {
-    padding: "4px 8px"
+    padding: "8px 16px"
   },
   [theme.breakpoints.down("sm")]: {
-    padding: "3px 7px",
-    borderRadius: "2px",
+    padding: "6px 14px",
     fontSize: "14px"
   },
   [theme.breakpoints.down("xs")]: {
-    padding: "2px 6px"
+    padding: "4px 12px"
   }
 }));

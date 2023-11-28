@@ -3,8 +3,18 @@
     box-shadow: $box_shadow;
     background-color: $white;
     overflow: hidden;
+    .completed_flag{
+        color:greenyellow;
+    }
+    .not_completed_flag{
+        color:$gray;
+    }
+    .completed{
+        opacity:0.5;
+    }
     .task_cat{
         background-color: $main;
+        color: $white;
         & svg{
             color: $white;
         }
