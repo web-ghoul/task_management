@@ -1,5 +1,30 @@
+@import "../../assets/styles/variable.scss";
 .logo{
     .logo_image{
         width: 40px;
+    }
+
+    @media (max-width:$lg_size) {
+        .logo_image{
+            width: 35px;
+        }
+    }
+
+    @media (max-width:$md_size) {
+        .logo_image{
+            width: 30px;
+        }
+    }
+
+    @media (max-width:$sm_size) {
+        .logo_image{
+            width: 25px;
+        }
+    }
+
+    @media (max-width:$xs_size) {
+        .logo_image{
+            width: 20px;
+        }
     }
 }

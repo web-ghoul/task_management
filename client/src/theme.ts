@@ -65,7 +65,8 @@ theme.typography.h2 = {
     fontSize: "2.6rem"
   },
   [theme.breakpoints.down("sm")]: {
-    fontSize: "2.4rem"
+    fontSize: "2.4rem",
+    lineHeight: "1.2"
   },
   [theme.breakpoints.down("xs")]: {
     fontSize: "2.2rem"
@@ -107,7 +108,8 @@ theme.typography.h4 = {
 theme.typography.h5 = {
   fontSize: "1.4rem",
   [theme.breakpoints.down("lg")]: {
-    fontSize: "1.3rem"
+    fontSize: "1.3rem",
+    lineHeight: "1.2"
   },
   [theme.breakpoints.down("md")]: {
     fontSize: "1.2rem"

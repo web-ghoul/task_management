@@ -1,10 +1,4 @@
-import {
-  AppBar,
-  Box,
-  Container,
-  Typography,
-  useMediaQuery
-} from "@mui/material";
+import { AppBar, Box, Typography, useMediaQuery } from "@mui/material";
 import Logo from "../Logo/Logo";
 import { PrimaryButton } from "../../mui/PrimaryButton";
 import { SecondaryButton } from "../../mui/SecondaryButton";
@@ -18,6 +12,7 @@ import maleImg from "../../assets/images/male.png";
 import femaleImg from "../../assets/images/female.png";
 import { LoginRounded, LogoutRounded } from "@mui/icons-material";
 import { PrimaryIconButton } from "../../mui/PrimaryIconButton";
+import { PrimaryContainer } from "../../mui/PrimaryContainer";
 
 type Props = {};
 
@@ -33,19 +28,19 @@ const Header = (props: Props) => {
   };
   return (
     <AppBar className={`flex center_rel_x fixed jcc aic ${styles.header}`}>
-      <Container className={`flex jcsb aic g30`}>
+      <PrimaryContainer className={`flex jcsb aic g30`}>
         <Logo />
         {token && userId
           ? <Box className={`flex jcfe aic g20`}>
               {user &&
                 <Box className={`flex jcfe aic g10`}>
                   <Box className={`grid jcfe aic`}>
-                    <Typography variant="h5" className={`tae`}>
+                    <Typography variant="h6" className={`tae`}>
                       {user.username}
                     </Typography>
-                    <Typography variant="subtitle1">
+                    {/* <Typography variant="subtitle1">
                       {user.email}
-                    </Typography>
+                    </Typography> */}
                   </Box>
                   <LazyLoadImage
                     className={`${styles.avatar}`}
@@ -55,8 +50,8 @@ const Header = (props: Props) => {
               <a href={`${process.env.REACT_APP_LOGIN_PAGE}`}>
                 {mdSize
                   ? <PrimaryIconButton onClick={handleLogOut}>
-                    <LogoutRounded/>
-                  </PrimaryIconButton>
+                      <LogoutRounded />
+                    </PrimaryIconButton>
                   : <PrimaryButton onClick={handleLogOut}>
                       Logout
                     </PrimaryButton>}
@@ -64,16 +59,18 @@ const Header = (props: Props) => {
             </Box>
           : <Box className={`flex jcfe aic g20`}>
               <a href={`${process.env.REACT_APP_LOGIN_PAGE}`}>
-                <PrimaryButton>
-                  {mdSize ? <LoginRounded /> : "Login"}
-                </PrimaryButton>
+                {mdSize
+                  ? <PrimaryIconButton>
+                      <LoginRounded />
+                    </PrimaryIconButton>
+                  : <PrimaryButton>Login</PrimaryButton>}
               </a>
-              {mdSize &&
-                <a href={`${process.env.REACT_APP_REGISTER_PAGE}`}>
-                  <SecondaryButton>Register</SecondaryButton>
-                </a>}
+
+              <a href={`${process.env.REACT_APP_REGISTER_PAGE}`}>
+                <SecondaryButton>Register</SecondaryButton>
+              </a>
             </Box>}
-      </Container>
+      </PrimaryContainer>
     </AppBar>
   );
 };
